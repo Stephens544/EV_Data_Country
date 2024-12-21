@@ -1,4 +1,3 @@
-
 ## Process and Clean Data ## 
 
 #clean up name
@@ -42,7 +41,7 @@ WHERE row_num = 1;
 #check for near duplicates
 SELECT region, parameter, `mode`, `year`, unit, powertrain, COUNT(*) AS duplicate_count
 FROM ev_data_staging
-group by region, parameter, `mode`, `year`, unit, powertrain
+GROUP BY region, parameter, `mode`, `year`, unit, powertrain
 HAVING duplicate_count > 1;
 
 #1736 near duplicates found.  
@@ -130,7 +129,7 @@ GROUP BY region
 ORDER BY '2035_total' desc;
 
 #table with 2020, 2025, 2030, and 2035 summed results
-WITH CTE_Example AS (
+WITH CTE_1 AS (
 SELECT region, 
 	SUM(CASE WHEN parameter = 'EV charging points' AND `year` = 2020 AND region != 'World' AND category = 'Historical' THEN `value` END) AS Charging_Points_2020,
     SUM(CASE WHEN parameter = 'EV charging points' AND `year` = 2025 AND region != 'World' AND category = 'Projection-APS' THEN `value` END) AS Charging_Points_2025,
@@ -145,7 +144,7 @@ SELECT region,
         Charging_Points_2030, 
         Charging_Points_2035, 
         CASE WHEN Charging_Points_2020 IS NOT NULL THEN ROUND ((Charging_Points_2035 / Charging_Points_2020*100)-100,0) END AS Percentage_Increase_2020_to_2035
-FROM CTE_Example
+FROM CTE_1
 ORDER BY Percentage_Increase_2020_to_2035 DESC;
 
 # India's growth projections for charging points from 2020 to 2035 are 549,196%  
@@ -154,22 +153,6 @@ ORDER BY Percentage_Increase_2020_to_2035 DESC;
 SELECT * 
 FROM ev_data_staging
 WHERE (region = "India" AND parameter = "EV charging points" AND (`year` = 2020 OR `year` = 2025 OR `year` = 2030 OR `year` = 2035));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
